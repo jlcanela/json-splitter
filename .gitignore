@@ -1,0 +1,10 @@
+target
+.bloop
+.bsp
+.metals
+.vscode
+data
+database.env
+output
+project/project
+project/metals.sbt

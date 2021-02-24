@@ -1,0 +1,17 @@
+package datavault.service
+
+import zio._
+
+object Repository {
+
+  // Service definition
+  trait Service {
+  }
+
+  // Module implementation
+  val repository: ZLayer[Any, Nothing, Repository] = ZLayer.succeed {
+    new Service {
+      
+    }
+  }
+}
