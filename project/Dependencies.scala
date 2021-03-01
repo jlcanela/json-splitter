@@ -34,6 +34,11 @@ object Dependencies {
     "org.json4s"                      %% "json4s-native"          % "3.7.0-M8"
   )
 
+  lazy val awsSdk = Seq(
+    "dev.zio"      %% "zio-s3"          % "0.3.0",
+    "com.amazonaws" % "aws-java-sdk-s3" % "1.11.964"
+  )
+
   lazy val datagen = Seq(
     "com.github.azakordonets" %% "fabricator" % "2.1.5",
     "com.github.javafaker"     % "javafaker"  % "0.15",

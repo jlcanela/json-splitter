@@ -36,7 +36,7 @@ Global / testFrameworks := Seq(new TestFramework("zio.test.sbt.ZTestFramework"))
 coverageMinimum := 85
 coverageFailOnMinimum := true
 
-libraryDependencies ++= Dependencies.datavault ++ Dependencies.datagen
+libraryDependencies ++= Dependencies.datavault ++ Dependencies.datagen ++ Dependencies.awsSdk
 scalaVersion := customScalaVersion
 scalacOptions := customScalacOptions
 

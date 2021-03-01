@@ -12,3 +12,18 @@ To verify: 
 cat out/a.json 
 { "nodeType": "a"}
 ```
+
+Install awslocal
+```
+pip install awscli-local
+```
+
+or use 
+```
+aws --endpoint-url=http://localhost:4566 
+```
+
+```
+awslocal s3 mb s3://mybucket
+awslocal s3 cp src/test/resources/sample.json s3://mybucket/in/sample.json
+```
