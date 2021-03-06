@@ -35,6 +35,14 @@ object Splitter {
         stream    = ZStream.fromQueueWithShutdown(queue)
       } yield (feedQueue, stream)
 
+      def showBuckets: ZIO[Blocking with Console with S3 with Clock, Throwable, Unit] = for {
+        _ <- console.putStrLn("showing buckets")
+        st = createStream(S3File("mybucket", "in/sample.json"))
+        queue <- createQueue(S3File("mybucket", "out"), "default")
+        _     <- st.run(Sink.foreach((s: String) => queue.offer(s))).ensuring(queue.shutdown)
+        _     <- ZIO.succeed(()).delay(Duration.ofMillis(1500))
+      } yield ()
+
       def writeS3Data(
           zs: ZStream[Blocking with S3 with Console, Throwable, Byte],
           bucket: String,
@@ -61,29 +69,21 @@ object Splitter {
         }
       } yield queue
 
-      def showBuckets: ZIO[Blocking with Console with S3 with Clock, Throwable, Unit] = for {
-        _ <- console.putStrLn("showing buckets")
-        st = createStream(S3File("mybucket", "in/sample.json"))
-        queue <- createQueue(S3File("mybucket", "out"), "default")
-        _     <- st.run(Sink.foreach((s: String) => queue.offer(s))).ensuring(queue.shutdown)
-        _     <- ZIO.succeed(()).delay(Duration.ofMillis(1500))
-      } yield ()
-
-      def createS3Stream(path: S3File): ZStream[S3, Throwable, Byte] =
-        s3.getObject(path.bucket, path.path)
-
-      def createLocalStream(path: Path): ZStream[Blocking, Throwable, Byte] =
-        ZStream.fromFile(path)
-
-      def gunzip(stream: ZStream[S3 with Blocking, Throwable, Byte], path: String) = if (
-        path.endsWith(".gz")
-      ) {
-        stream.transduce(ZTransducer.gunzip(1024 * 64))
-      } else {
-        stream
-      }
-
       def createStream(path: JPath): ZStream[S3 with Blocking, Throwable, String] = {
+
+        def createS3Stream(path: S3File): ZStream[S3, Throwable, Byte] =
+          s3.getObject(path.bucket, path.path)
+
+        def createLocalStream(path: Path): ZStream[Blocking, Throwable, Byte] =
+          ZStream.fromFile(path)
+
+        def gunzip(stream: ZStream[S3 with Blocking, Throwable, Byte], path: String) = if (
+          path.endsWith(".gz")
+        ) {
+          stream.transduce(ZTransducer.gunzip(1024 * 64))
+        } else {
+          stream
+        }
 
         def stream = path match {
           case path @ S3File(_, key) => gunzip(createS3Stream(path), key)

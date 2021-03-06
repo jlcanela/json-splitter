@@ -3,7 +3,7 @@ import BuildHelper._
 inThisBuild(
   List(
     organization := "dev.zio",
-    homepage := Some(url("https://github.com/jlcanela/data-vault-lib/")),
+    homepage := Some(url("https://github.com/jlcanela/json-splitter/")),
     licenses := List("Apache-2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0")),
     developers := List(
       Developer(
@@ -36,8 +36,19 @@ Global / testFrameworks := Seq(new TestFramework("zio.test.sbt.ZTestFramework"))
 coverageMinimum := 85
 coverageFailOnMinimum := true
 
-libraryDependencies ++= Dependencies.datavault ++ Dependencies.datagen ++ Dependencies.awsSdk
+libraryDependencies ++= Dependencies.jsonSplitter ++ Dependencies.awsSdk
 scalaVersion := customScalaVersion
 scalacOptions := customScalacOptions
 
-// addCompilerPlugin("org.scalameta" % "semanticdb-scalac_2.12.13" % "4.4.10")
+assemblyMergeStrategy in assembly := {
+  case "META-INF/io.netty.versions.properties"  => MergeStrategy.first
+  case "codegen-resources/customization.config" => MergeStrategy.first
+  case "codegen-resources/paginators-1.json"    => MergeStrategy.first
+  case "codegen-resources/service-2.json"       => MergeStrategy.first
+  case "scala/annotation/nowarn$.class"         => MergeStrategy.first
+  case "scala/annotation/nowarn.class"          => MergeStrategy.first
+  case "module-info.class"                      => MergeStrategy.first
+  case x =>
+    val oldStrategy = (assemblyMergeStrategy in assembly).value
+    oldStrategy(x)
+}
